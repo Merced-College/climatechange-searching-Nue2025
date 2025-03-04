@@ -72,29 +72,25 @@ void StateClimate::display() const {
               << ", Temp (F): " << temp << ", Temp (C): " << tempc << std::endl;
 }
 
-
 /* Notes:
-Binary serach here!!!!!!!!!!!!! 
-make sure that you do NOT use recursion.
+ * Binary Search
 */
 int binarySearch(std::vector<StateClimate> climateDataInBinary, int target){
     int lowIndex = 0;
     int highIndex = climateDataInBinary.size() - 1;
-    //use loop here
 
     while (lowIndex <= highIndex){
-        int midIndex = lowIndex + (lowIndex + highIndex)/2;
+        int midIndex = lowIndex + (highIndex - lowIndex) / 2;
         if (target == climateDataInBinary[midIndex].getFips()){
             return midIndex;
         }else if(target < climateDataInBinary[midIndex].getFips()){
-            lowIndex = midIndex + 1;
-        }else if (target > climateDataInBinary[midIndex].getFips()){
             highIndex = midIndex - 1;
+        }else if (target > climateDataInBinary[midIndex].getFips()){
+            lowIndex = midIndex + 1;
         }
     }
     return -1;
 }//End binary search class
-
 
 
 int main() {
@@ -117,7 +113,7 @@ int main() {
         ss >> fips >> comma >> year >> comma >> temp >> comma >> tempc;
         climateData.emplace_back(fips, year, temp, tempc);
     }
-
+    
     file.close();
 
     //getting input for the search process upcoming
@@ -127,27 +123,24 @@ int main() {
     std::cout << std::endl;
 
 
-//call binary search and then go through the vector and display the data
+    //Call binary search and then go through the vector and display the data
     int indexOfData = binarySearch(climateData/*VECTOR ABOVE*/, stateID/*TARGET*/);
-    while(climateData.at(indexOfData).getFips() == stateID){
-        climateData.at(indexOfData).display();
-        indexOfData--;
-
-        //Where does this if statement come from?
-        if(indexOfData!=0){
-            indexOfData++;
+    if (indexOfData != -1) {
+        int i = indexOfData;
+        while (i >= 0 && climateData.at(i).getFips() == stateID) {
+            climateData.at(i).display();
+            i--;
         }
-    }
-    while(climateData.at(indexOfData).getFips() == stateID){
-        climateData.at(indexOfData).display();
-        indexOfData--;
-        if(indexOfData == climateData.size()){
-            break;
+        i = indexOfData + 1;
+        while (i < climateData.size() && climateData.at(i).getFips() == stateID) {
+            climateData.at(i).display();
+            i++;
         }
+    } else {
+        std::cout << "State with FIP code " << stateID << " not found." << std::endl;
     }
 
-    /* 
-    // Display data
+    /* Display data
     for (const auto &entry : climateData) {
         entry.display();
     }
